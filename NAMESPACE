@@ -1,0 +1,9 @@
+
+useDynLib(qrupdate)
+
+export(qr.delete.row)
+export(qr.add.row)
+export(qr.delete.column)
+export(qr.add.column)
+export(solve.myqr)
+

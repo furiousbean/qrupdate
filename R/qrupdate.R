@@ -19,7 +19,9 @@ qr.delete.row <- function(Q, R, k) {
     if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
         stop("check the dimensions of matrices")
     
-    .Call("modernfastqrdeleterow", R, Q, k, PACKAGE = "qrupdate")
+    result <- .Call("modernfastqrdeleterow", R, Q, k, PACKAGE = "qrupdate")
+    qrupdate.clean()
+    result
 }
 
 qr.add.row <- function(Q, R, k, u) {
@@ -40,7 +42,9 @@ qr.add.row <- function(Q, R, k, u) {
         stop("check the dimensions of matrices")
     if (length(u) != n) stop("check the length of vector u")
     
-    .Call("modernfastqraddrow", R, Q, k, u, PACKAGE = "qrupdate")
+    result <- .Call("modernfastqraddrow", R, Q, k, u, PACKAGE = "qrupdate")
+    qrupdate.clean()
+    result
 }
 
 qr.delete.column <- function(Q, R, k) {
@@ -58,7 +62,9 @@ qr.delete.column <- function(Q, R, k) {
     if (n == 1) stop("resultant matrix is empty")
     if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
         stop("check the dimensions of matrices")
-    .Call("modernfastqrdeletecolumn", R, Q, k, PACKAGE = "qrupdate")
+    result <- .Call("modernfastqrdeletecolumn", R, Q, k, PACKAGE = "qrupdate")
+    qrupdate.clean()
+    result
 }
 
 qr.add.column <- function(Q, R, k, u) {
@@ -79,10 +85,12 @@ qr.add.column <- function(Q, R, k, u) {
         stop("check the dimensions of matrices")
     if (length(u) != m) stop("check the length of vector u")
     
-    .Call("modernfastqraddcolumn", R, Q, k, u, PACKAGE = "qrupdate")
+    result <- .Call("modernfastqraddcolumn", R, Q, k, u, PACKAGE = "qrupdate")
+    qrupdate.clean()
+    result
 }
 
-solve.myqr <- function(Q, R, b) { 
+solve.qrupdate <- function(Q, R, b) { 
     stopifnot(is.numeric(Q))
     stopifnot(is.numeric(R))
     stopifnot(is.numeric(b))
@@ -96,5 +104,9 @@ solve.myqr <- function(Q, R, b) {
         stop("check the dimensions of matrices")
     if (nrow(R) != length(b)) stop("check the length of vector b")
     
-    .Call("modernfastqrsolve", R, Q, b)
+    .Call("modernfastqrsolve", R, Q, b, PACKAGE = "qrupdate")
+}
+
+qrupdate.clean <- function() {
+    .Call("modernclean")
 }

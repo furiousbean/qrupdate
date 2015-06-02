@@ -1,6 +1,6 @@
 
-#include <R_ext/Lapack.h>
 #include <R_ext/BLAS.h>
+#include <R_ext/LAPACK.h>
 #include "string.h"
 #include "stdlib.h"
 #include "fastqrupdate.h"
@@ -17,14 +17,19 @@ double *newR, double *newQ) {
     
     for (int j = 0; j < m; j++) q[j] = Q[k + j * m];
     
-    for (int j = m - 2; j >= 0; --j) {
-        double a = q[j];
-        double b = q[j + 1];
-        F77_CALL(drotg)(&a, &b, cvec + j, svec + j);
-        q[j] = cvec[j] * q[j] + svec[j] * q[j + 1];
+    for (int i = m - 2; i >= 0; --i) {
+        double a = q[i];
+        double b = q[i + 1];
+        F77_CALL(drotg)(&a, &b, cvec + i, svec + i);
+        q[i] = cvec[i] * q[i] + svec[i] * q[i + 1];
+        
+        double tmp;
+        for (int j = i; j < n; ++j) {
+            tmp = R[i + j * m];
+            R[i + j * m] = cvec[i] * R[i + j * m] + svec[i] * R[i + j * m + 1];
+            R[i + j * m + 1] = -svec[i] * tmp + cvec[i] * R[i + j * m + 1];
+        }
     }
-    
-    F77_CALL(dlasr)("L", "V", "B", &m, &n, cvec, svec, R, &m);
     
     for (int i = 0; i < n; ++i) {
         memcpy(newR + i * (m - 1), R + 1 + i * m, (m - 1) * sizeof(double));
@@ -67,7 +72,7 @@ double *newR, double *newQ) {
         memcpy(newQ + i * (m + 1), Q + i * m, k * sizeof(double));
         newQ[k + i * (m + 1)] = 0;
         memcpy(newQ + k + 1 + i * (m + 1), Q + k + i * m, 
-               (m - k) * sizeof(double));
+        (m - k) * sizeof(double));
     }
     
     memset(newQ + m * (m + 1), 0, (m + 1) * sizeof(double));
@@ -81,8 +86,10 @@ double *newR, double *newQ) {
         for (int j = i; j < n; ++j) {
             tmp = newR[i + j * (m + 1)];
             newR[i + j * (m + 1)] = cvec[i] * newR[i + j * (m + 1)] + 
-                svec[i] * newR[m + j * (m + 1)];
-            newR[m + j * (m + 1)] = -svec[i] * tmp + cvec[i] * newR[m + j * (m + 1)];
+            svec[i] * newR[m + j * (m + 1)];
+            
+            newR[m + j * (m + 1)] = -svec[i] * tmp + 
+            cvec[i] * newR[m + j * (m + 1)];
         }
     }
     
@@ -122,8 +129,10 @@ double *newR) {
         for (int j = i; j < n - 1; ++j) {
             tmp = newR[i + j * m];
             newR[i + j * m] = cvec[i] * newR[i + j * m] + 
-                svec[i] * newR[i + j * m + 1];
-            newR[i + j * m + 1] = -svec[i] * tmp + cvec[i] * newR[i + j * m + 1];
+            svec[i] * newR[i + j * m + 1];
+            
+            newR[i + j * m + 1] = -svec[i] * tmp + 
+            cvec[i] * newR[i + j * m + 1];
         }
     }
     
@@ -146,7 +155,7 @@ double *newR) {
     double zero = 0.0;
     int oneint = 1;
     
-    double *qtu = (double *) calloc(m, sizeof(double));
+    double *qtu = (double *) malloc(m * sizeof(double));
     F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, u, &oneint, &zero, qtu, &oneint);
     
     memcpy(newR, R, (k * m) * sizeof(double));
@@ -187,13 +196,9 @@ void fastqrsolve(int *pm, double *R, double *Q, double *b, double *x) {
     double one = 1.0;
     double zero = 0.0;
     int oneint = 1;
-    double *qtb = (double *) calloc(m, sizeof(double));
+    double *qtb = (double *) malloc(m * sizeof(double));
     F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, b, &oneint, &zero, qtb, &oneint);
     F77_CALL(dtrsv)("U", "N", "N", &m, R, &m, qtb, &oneint);
     memcpy(x, qtb, m * sizeof(double));
     free(qtb);
 }
-    //F77_CALL(dpotri)("L", n, a, n, &info);
-    //if (info != 0)
-    //   error("inverse computation failed");
-    // but we still only have the lower triangle of the result in a

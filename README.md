@@ -3,7 +3,7 @@ A tiny R package which implements fast update of QR decomposition of a matrix.
 
 These operations are implemented:
 
-    -    Add a column to QR decomposition
+    -   Add a column to QR decomposition
     -   Remove a column from QR decomposition
     -   Add a row to QR decomposition
     -   Remove a row from QR decomposition
@@ -16,7 +16,7 @@ devtools::install_github("furiousbean/qrupdate")
 ```
 
 ## Example of usage
-### Slow mathod (but with input checking)
+### Slow method (but with input checking)
 ```r
 R <- matrix(0, nrow = 1)
 Q <- matrix(0, nrow = 1)
@@ -26,7 +26,7 @@ x <- solve.qrupdate(Q, R, c(5, 3))
 print(x) #(3, 5)
 ```
 
-### Fast mathod (unsafe)
+### Fast method (unsafe)
 ```r
 R <- matrix(0, nrow = 1)
 Q <- matrix(1, nrow = 1)

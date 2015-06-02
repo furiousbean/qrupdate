@@ -2,11 +2,11 @@
 A tiny R package which implements fast update of QR decomposition of a matrix.
 
 These operations are implemented:
--Add a column to QR decomposition
--Remove a column from QR decomposition
--Add a row to QR decomposition
--Remove a row from QR decomposition
--Solve a system of order n by n for given QR decomposition
+    -    Add a column to QR decomposition
+    -   Remove a column from QR decomposition
+    -   Add a row to QR decomposition
+    -   Remove a row from QR decomposition
+    -   Solve a system of order n by n for given QR decomposition
 
 ## How to install
 ```r
@@ -43,11 +43,11 @@ Hammarling, Sven, and Craig Lucas. "Updating the QR factorization and the least 
 Beerware license
 
 ## TODO
--Manual
--Bug fixes
--Working with block of columns/rows
--Tests
--Checking
--Maybe use "qr" structure?
--???
--Maybe profit
+    -   Manual
+    -   Bug fixes
+    -   Working with block of columns/rows
+    -   Tests
+    -   Checking
+    -   Maybe use "qr" object?
+    -   ???
+    -   Maybe profit

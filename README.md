@@ -2,6 +2,7 @@
 A tiny R package which implements fast update of QR decomposition of a matrix.
 
 These operations are implemented:
+
     -    Add a column to QR decomposition
     -   Remove a column from QR decomposition
     -   Add a row to QR decomposition

@@ -1,9 +1,17 @@
 
 useDynLib(qrupdate)
 
-export(qr.delete.row)
-export(qr.add.row)
-export(qr.delete.column)
-export(qr.add.column)
-export(solve.qrupdate)
-export(qrupdate.clean)
+export(qrupdate,
+       deleterow,
+       addrow,
+       deletecolumn,
+       addcolumn)
+S3method("qrupdate", "qr")
+S3method("qrupdate", "default")
+S3method("deleterow", "qrupdate")
+S3method("addrow", "qrupdate")
+S3method("deletecolumn", "qrupdate")
+S3method("addcolumn", "qrupdate")
+S3method("solve", "qrupdate")
+
+export(cleanmem)

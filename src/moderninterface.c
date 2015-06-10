@@ -6,10 +6,28 @@
 #include "string.h"
 #include "stdlib.h"
 
+//const int THRESHOLD = 0;
+
 static double* workR = NULL;
 static double* workQ = NULL;
+//static int workRsize = -1;
+//static int workQsize = -1;
 
-SEXP modernfastqrsolve(SEXP Rexp, SEXP Qexp, SEXP bexp) {
+/*void workRrealloc(int m, int n) {
+    if (m * n > workRsize) {
+        workRsize = (m + THRESHOLD) * (n + THRESHOLD);
+        workR = (double*) realloc(workR, workRsize * sizeof(double));
+    }
+}
+
+void workQrealloc(int m) {
+    if (m * m > workQsize) {
+        workQsize = (m + THRESHOLD) * (m + THRESHOLD);
+        workQ = (double*) realloc(workQ, workQsize * sizeof(double));
+    }
+}
+*/
+SEXP miqrsolve(SEXP Rexp, SEXP Qexp, SEXP bexp) {
     int m = INTEGER(getAttrib(Qexp, R_DimSymbol))[0];
     SEXP xexp = PROTECT(allocVector(REALSXP, m));
     fastqrsolve(&m, REAL(Rexp), REAL(Qexp), REAL(bexp), REAL(xexp));
@@ -18,13 +36,15 @@ SEXP modernfastqrsolve(SEXP Rexp, SEXP Qexp, SEXP bexp) {
     return xexp;
 }
 
-SEXP modernfastqrdeleterow(SEXP Rexp, SEXP Qexp, SEXP kexp) {
+SEXP miqrdeleterow(SEXP Rexp, SEXP Qexp, SEXP kexp) {
     int m = INTEGER(getAttrib(Rexp, R_DimSymbol))[0];
     int n = INTEGER(getAttrib(Rexp, R_DimSymbol))[1];
     int pk = INTEGER(kexp)[0];
 
     workR = (double*) realloc(workR, m * n * sizeof(double));
     workQ = (double*) realloc(workQ, m * m * sizeof(double));
+    //workRrealloc(m, n);
+    //workQrealloc(m);
     
     memcpy(workR, REAL(Rexp), m * n * sizeof(double));
     memcpy(workQ, REAL(Qexp), m * m * sizeof(double));
@@ -45,12 +65,16 @@ SEXP modernfastqrdeleterow(SEXP Rexp, SEXP Qexp, SEXP kexp) {
     return ansexp;
 }
 
-SEXP modernfastqraddrow(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
+SEXP miqraddrow(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
     int m = INTEGER(getAttrib(Rexp, R_DimSymbol))[0];
     int n = INTEGER(getAttrib(Rexp, R_DimSymbol))[1];
     int pk = INTEGER(kexp)[0];
+    
     workR = (double*) realloc(workR, m * n * sizeof(double));
     workQ = (double*) realloc(workQ, m * m * sizeof(double));
+    //workRrealloc(m, n);
+    //workQrealloc(m);
+    
     memcpy(workR, REAL(Rexp), m * n * sizeof(double));
     memcpy(workQ, REAL(Qexp), m * m * sizeof(double));
     SEXP ansR = PROTECT(allocMatrix(REALSXP, m + 1, n));
@@ -70,12 +94,13 @@ SEXP modernfastqraddrow(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
     return ansexp;
 }
 
-SEXP modernfastqrdeletecolumn(SEXP Rexp, SEXP Qexp, SEXP kexp) {
+SEXP miqrdeletecolumn(SEXP Rexp, SEXP Qexp, SEXP kexp) {
     int m = INTEGER(getAttrib(Rexp, R_DimSymbol))[0];
     int n = INTEGER(getAttrib(Rexp, R_DimSymbol))[1];
     int pk = INTEGER(kexp)[0];
     workR = (double*) realloc(workR, m * n * sizeof(double));
-
+    //workRrealloc(m, n);
+    
     memcpy(workR, REAL(Rexp), m * n * sizeof(double));
     SEXP ansR = PROTECT(allocMatrix(REALSXP, m, n - 1));
     SEXP ansQ = PROTECT(allocMatrix(REALSXP, m, m));
@@ -95,12 +120,13 @@ SEXP modernfastqrdeletecolumn(SEXP Rexp, SEXP Qexp, SEXP kexp) {
     return ansexp;
 }
 
-SEXP modernfastqraddcolumn(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
+SEXP miqraddcolumn(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
     int m = INTEGER(getAttrib(Rexp, R_DimSymbol))[0];
     int n = INTEGER(getAttrib(Rexp, R_DimSymbol))[1];
     int pk = INTEGER(kexp)[0];
     workR = (double*) realloc(workR, m * n * sizeof(double));
-
+    //workRrealloc(m, n);
+    
     memcpy(workR, REAL(Rexp), m * n * sizeof(double));
     SEXP ansR = PROTECT(allocMatrix(REALSXP, m, n + 1));
     SEXP ansQ = PROTECT(allocMatrix(REALSXP, m, m));
@@ -120,11 +146,13 @@ SEXP modernfastqraddcolumn(SEXP Rexp, SEXP Qexp, SEXP kexp, SEXP uexp) {
     return ansexp;
 }
 
-SEXP modernclean() {
+SEXP miclean() {
     free(workR);
     free(workQ);
     workR = NULL;
     workQ = NULL;
+    //workRsize = -1;
+    //workQsize = -1;
     SEXP retnull = PROTECT(allocVector(NILSXP, 1));
     UNPROTECT(1);
     return retnull;

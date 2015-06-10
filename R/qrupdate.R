@@ -3,110 +3,93 @@
 # QR add/remove row/column functions
 # see http://eprints.ma.man.ac.uk/1192/01/covered/MIMS_ep2008_111.pdf
 
-qr.delete.row <- function(Q, R, k) {
-    stopifnot(is.numeric(Q))
-    stopifnot(is.numeric(R))
-    stopifnot(is.finite(Q))
-    stopifnot(is.finite(R))
-    stopifnot(is.matrix(Q))
-    stopifnot(is.matrix(R))
-    stopifnot(is.integer(k))
-    n <- ncol(R)
-    m <- nrow(R)
+qrupdate <- function(...) UseMethod("qrupdate")
+deleterow <- function(...) UseMethod("deleterow")
+addrow <- function(...) UseMethod("addrow")
+deletecolumn <- function(...) UseMethod("deletecolumn")
+addcolumn <- function(...) UseMethod("addcolumn")
+
+qrupdate.default <- function(...) 
+    stop("qrupdate() takes only numeric 'qr' object!")
+
+qrupdate.qr <- function(decomp) {
+    if (!is.numeric(decomp$qr))
+        stop("Complex matrices are not supported now, sorry")
+    structure(list(Q = qr.Q(decomp, complete = TRUE), 
+                   R = qr.R(decomp, complete = TRUE)), class = "qrupdate")
+}
+
+deleterow.qrupdate <- function(prevdec, k, clean = TRUE) {
+    k <- as.integer(k)
+    n <- ncol(prevdec$R)
+    m <- nrow(prevdec$R)
     
     if (!(k >= 1 & k <= m)) stop("K isn't in 1:nrow(X)")
-    if (m == 1) stop("resultant matrix is empty")
-    if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
-        stop("check the dimensions of matrices")
     
-    result <- .Call("modernfastqrdeleterow", R, Q, k, PACKAGE = "qrupdate")
-    qrupdate.clean()
+    result <- .Call("miqrdeleterow", prevdec$R, prevdec$Q, k, 
+                    PACKAGE = "qrupdate")
+    if (clean) qrupdate::cleanmem()
+    class(result) <- "qrupdate"
     result
 }
 
-qr.add.row <- function(Q, R, k, u) {
-    stopifnot(is.numeric(Q))
-    stopifnot(is.numeric(R))
+addrow.qrupdate <- function(prevdec, k, u, clean = TRUE) {
     stopifnot(is.numeric(u))
-    stopifnot(is.finite(Q))
-    stopifnot(is.finite(R))
     stopifnot(is.finite(u))
-    stopifnot(is.matrix(Q))
-    stopifnot(is.matrix(R))
-    stopifnot(is.integer(k))
-    n <- ncol(R)
-    m <- nrow(R)
+    k <- as.integer(k)
+    n <- ncol(prevdec$R)
+    m <- nrow(prevdec$R)
     
     if (!(k >= 1 & k <= m + 1)) stop("k isn't in 1:(nrow(X) + 1)")
-    if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
-        stop("check the dimensions of matrices")
-    if (length(u) != n) stop("check the length of vector u")
+    if (length(u) != n) stop("Check the length of vector u")
     
-    result <- .Call("modernfastqraddrow", R, Q, k, u, PACKAGE = "qrupdate")
-    qrupdate.clean()
+    result <- .Call("miqraddrow", prevdec$R, prevdec$Q, k, u, 
+                    PACKAGE = "qrupdate")
+    if (clean) qrupdate::cleanmem()
+    class(result) <- "qrupdate"
     result
 }
 
-qr.delete.column <- function(Q, R, k) {
-    stopifnot(is.numeric(Q))
-    stopifnot(is.numeric(R))
-    stopifnot(is.finite(Q))
-    stopifnot(is.finite(R))
-    stopifnot(is.matrix(Q))
-    stopifnot(is.matrix(R))
-    stopifnot(is.integer(k))
-    n <- ncol(R)
-    m <- nrow(R)
+deletecolumn.qrupdate <- function(prevdec, k, clean = TRUE) {
+    k <- as.integer(k)    
+    n <- ncol(prevdec$R)
+    m <- nrow(prevdec$R)
     
     if (!(k >= 1 & k <= n)) stop("k isn't in 1:ncol(X)")
-    if (n == 1) stop("resultant matrix is empty")
-    if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
-        stop("check the dimensions of matrices")
-    result <- .Call("modernfastqrdeletecolumn", R, Q, k, PACKAGE = "qrupdate")
-    qrupdate.clean()
+    result <- .Call("miqrdeletecolumn", prevdec$R, prevdec$Q, k, 
+                    PACKAGE = "qrupdate")
+    if (clean) qrupdate::cleanmem()
+    class(result) <- "qrupdate"
     result
 }
 
-qr.add.column <- function(Q, R, k, u) {
-    stopifnot(is.numeric(Q))
-    stopifnot(is.numeric(R))
+addcolumn.qrupdate <- function(prevdec, k, u, clean = TRUE) {
     stopifnot(is.numeric(u))
-    stopifnot(is.finite(Q))
-    stopifnot(is.finite(R))
     stopifnot(is.finite(u))
-    stopifnot(is.matrix(Q))
-    stopifnot(is.matrix(R))
-    stopifnot(is.integer(k))
-    n <- ncol(R)
-    m <- nrow(R)
+    k <- as.integer(k)    
+    
+    n <- ncol(prevdec$R)
+    m <- nrow(prevdec$R)
     
     if (!(k >= 1 & k <= n + 1)) stop("k isn't in 1:(nrow(X) + 1)")
-    if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
-        stop("check the dimensions of matrices")
-    if (length(u) != m) stop("check the length of vector u")
+    if (length(u) != m) stop("Check the length of vector u")
     
-    result <- .Call("modernfastqraddcolumn", R, Q, k, u, PACKAGE = "qrupdate")
-    qrupdate.clean()
+    result <- .Call("miqraddcolumn", prevdec$R, prevdec$Q, k, u, 
+                    PACKAGE = "qrupdate")
+    if (clean) qrupdate::cleanmem()
+    class(result) <- "qrupdate"
     result
 }
 
-solve.qrupdate <- function(Q, R, b) { 
-    stopifnot(is.numeric(Q))
-    stopifnot(is.numeric(R))
+solve.qrupdate <- function(decomp, b) { 
     stopifnot(is.numeric(b))
-    stopifnot(is.finite(Q))
-    stopifnot(is.finite(R))
     stopifnot(is.finite(b))
-    stopifnot(is.matrix(Q))
-    stopifnot(is.matrix(R))   
-    if (nrow(R) != ncol(R)) stop("Sorry, R must be square")
-    if (nrow(R) != nrow(Q) | nrow(R) != ncol(Q)) 
-        stop("check the dimensions of matrices")
-    if (nrow(R) != length(b)) stop("check the length of vector b")
+    if (nrow(decomp$R) != ncol(decomp$R)) stop("Sorry, R must be square matrix")
+    if (nrow(decomp$R) != length(b)) stop("Check the length of vector b")
     
-    .Call("modernfastqrsolve", R, Q, b, PACKAGE = "qrupdate")
+    .Call("miqrsolve", decomp$R, decomp$Q, b, PACKAGE = "qrupdate")
 }
 
-qrupdate.clean <- function() {
-    .Call("modernclean")
+cleanmem <- function() {
+    .Call("miclean")
 }

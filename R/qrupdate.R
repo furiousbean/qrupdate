@@ -1,7 +1,8 @@
 
 #PACKAGE FILE
-# QR add/remove row/column functions
+# QR add/remove of row/column wrappers
 # see http://eprints.ma.man.ac.uk/1192/01/covered/MIMS_ep2008_111.pdf
+# for the theory of QR factorization update
 
 qrupdate <- function(...) UseMethod("qrupdate")
 deleterow <- function(...) UseMethod("deleterow")
@@ -14,7 +15,7 @@ qrupdate.default <- function(...)
 
 qrupdate.qr <- function(decomp) {
     if (!is.numeric(decomp$qr))
-        stop("Complex matrices are not supported now, sorry")
+        stop("Complex matrices are not supported now")
     structure(list(Q = qr.Q(decomp, complete = TRUE), 
                    R = qr.R(decomp, complete = TRUE)), class = "qrupdate")
 }

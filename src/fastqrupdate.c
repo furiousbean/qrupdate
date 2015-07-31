@@ -1,4 +1,9 @@
 
+// PACKAGE FILE
+// QR add/remove of row/column functions
+// see http://eprints.ma.man.ac.uk/1192/01/covered/MIMS_ep2008_111.pdf
+// for the theory of QR factorization update
+
 #include <R_ext/BLAS.h>
 #include <R_ext/LAPACK.h>
 #include "string.h"
@@ -178,7 +183,8 @@ double *newR) {
             tmp = newR[i + j * m];
             newR[i + j * m] = cvec[i] * newR[i + j * m] + 
                 svec[i] * newR[i + j * m + 1];
-            newR[i + j * m + 1] = -svec[i] * tmp + cvec[i] * newR[i + j * m + 1];
+            newR[i + j * m + 1] = -svec[i] * tmp + 
+                cvec[i] * newR[i + j * m + 1];
         }
     }
     

@@ -1,11 +1,11 @@
 Package: qrupdate
 Type: Package
-Title: Fast QR decomposition updating operations
+Title: Fast QR factorization updating operations
 Version: 0.01
 Date: 2015-05-31
 Author: Nikita Zvonarev
 Maintainer: Nikita Zvonarev <nikitazvonarev@gmail.com>
-Description: A tiny package which implements fast addition/deletion of columns/rows in QR decomposition of a matrix.
+Description: A tiny package which implements fast addition/deletion of columns/rows in QR factorization of a matrix.
 License: beerware
 NeedsCompilation: yes
 URL: https://github.com/furiousbean/qrupdate

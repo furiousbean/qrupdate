@@ -37,15 +37,14 @@ print(x) #(3, 5)
 ```
 
 ## References
-Hammarling, Sven, and Craig Lucas. "Updating the QR factorization and the least squares problem." (2008). Available at http://eprints.ma.man.ac.uk/1192/01/covered/MIMS_ep2008_111.pdf
+Hammarling, Sven and Craig, Lucas. "Updating the QR factorization and the least squares problem." (2008). Available at http://eprints.ma.man.ac.uk/1192/01/covered/MIMS_ep2008_111.pdf
 
 ## License
 Beerware license
 
 ## TODO
-    -   Manual
     -   Bug fixes
-    -   Implement fast manipulation  of blocks of columns/rows
+    -   Implement fast manipulation with blocks of columns/rows
     -   Tests
     -   Checking
     -   ???

@@ -40,7 +40,7 @@ double *newR, double *newQ) {
         memcpy(newR + i * (m - 1), R + 1 + i * m, (m - 1) * sizeof(double));
     }
     
-    F77_CALL(dlasr)("R", "V", "B", &m, &m, cvec, svec, Q, &m);
+    F77_CALL(dlasr)("R", "V", "B", &m, &m, cvec, svec, Q, &m, 0, 0, 0);
     
     for (int i = 0; i < m - 1; ++i) {
         memcpy(newQ + i * (m - 1), Q + (i + 1) * m, 
@@ -104,7 +104,7 @@ double *newR, double *newQ) {
     
     int m1 = m + 1;
     
-    F77_CALL(dlasr)("R", "B", "F", &m1, &m1, cvec, svec, newQ, &m1);
+    F77_CALL(dlasr)("R", "B", "F", &m1, &m1, cvec, svec, newQ, &m1, 0, 0, 0);
     
     free(cvec);
     free(svec);
@@ -144,7 +144,7 @@ double *newR) {
     for (int i = 0; i < k; ++i) cvec[i] = 1.0;
     for (int i = lim; i < m - 1; ++i) cvec[i] = 1.0;
     
-    F77_CALL(dlasr)("R", "V", "F", &m, &m, cvec, svec, Q, &m);
+    F77_CALL(dlasr)("R", "V", "F", &m, &m, cvec, svec, Q, &m, 0, 0, 0);
     
     free(cvec);
     free(svec);
@@ -161,7 +161,7 @@ double *newR) {
     int oneint = 1;
     
     double *qtu = (double *) malloc(m * sizeof(double));
-    F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, u, &oneint, &zero, qtu, &oneint);
+    F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, u, &oneint, &zero, qtu, &oneint, 0);
     
     memcpy(newR, R, (k * m) * sizeof(double));
     memcpy(newR + k * m, qtu, m * sizeof(double));
@@ -190,7 +190,7 @@ double *newR) {
     
     for (int i = 0; i < k; ++i) cvec[i] = 1.0;
     
-    F77_CALL(dlasr)("R", "V", "B", &m, &m, cvec, svec, Q, &m);
+    F77_CALL(dlasr)("R", "V", "B", &m, &m, cvec, svec, Q, &m, 0, 0, 0);
     
     free(cvec);
     free(svec);
@@ -203,8 +203,8 @@ void fastqrsolve(int *pm, double *R, double *Q, double *b, double *x) {
     double zero = 0.0;
     int oneint = 1;
     double *qtb = (double *) malloc(m * sizeof(double));
-    F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, b, &oneint, &zero, qtb, &oneint);
-    F77_CALL(dtrsv)("U", "N", "N", &m, R, &m, qtb, &oneint);
+    F77_CALL(dgemv)("T", &m, &m, &one, Q, &m, b, &oneint, &zero, qtb, &oneint, 0);
+    F77_CALL(dtrsv)("U", "N", "N", &m, R, &m, qtb, &oneint, 0, 0, 0);
     memcpy(x, qtb, m * sizeof(double));
     free(qtb);
 }
